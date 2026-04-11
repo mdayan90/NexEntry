@@ -21,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -44,7 +45,7 @@ data class NavItem(
 val MainFamDarkBg = Color(0xFF0A0A0A)
 val MainFamGold = Color(0xFFE5C185)
 
-// Unique name to avoid ambiguity errors
+// Requested Blue Vertical Gradient for Dark Background or Light context
 val MainBlueGradientEffect = Brush.verticalGradient(
     listOf(
         Color(0xFF00A8FF), // Top
@@ -80,7 +81,8 @@ fun MainContainerScreen(isDarkMode: Boolean, onThemeChange: (Boolean) -> Unit) {
                             endY = 1000f
                         )
                     } else {
-                        MainBlueGradientEffect
+                        // Light theme background from screenshot
+                        Color(0xFFF5F7FF)
                     }
                 )
                 .padding(bottom = innerPadding.calculateBottomPadding())
@@ -96,44 +98,42 @@ fun MainContainerScreen(isDarkMode: Boolean, onThemeChange: (Boolean) -> Unit) {
 @Composable
 fun ModernFloatingBottomBar(selectedIndex: Int, onItemSelected: (Int) -> Unit, isDarkMode: Boolean, font: FontFamily) {
     val items = listOf(
-        NavItem("Home", Icons.Filled.Home, Icons.Filled.Home),
-        NavItem("Profile", Icons.Default.Person, Icons.Default.Person)
+        NavItem("HOME", Icons.Filled.Home, Icons.Filled.Home),
+        NavItem("PROFILE", Icons.Default.Person, Icons.Default.Person)
     )
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding() 
-            .padding(horizontal = 32.dp, vertical = 24.dp),
+            .padding(horizontal = 48.dp, vertical = 24.dp),
         contentAlignment = Alignment.Center
     ) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(72.dp)
-                .border(
-                    width = 1.dp, 
-                    color = if (isDarkMode) Color.White.copy(alpha = 0.1f) else Color.White.copy(alpha = 0.05f), 
-                    shape = RoundedCornerShape(35.dp)
+                .height(64.dp)
+                .shadow(
+                    elevation = if (isDarkMode) 0.dp else 12.dp,
+                    shape = RoundedCornerShape(32.dp),
+                    spotColor = Color(0xFF00A8FF).copy(alpha = 0.2f)
                 ),
-            color = if (isDarkMode) Color.Black else Color(0xFF003366), // Black in Dark Mode, Blue in Light
-            shape = RoundedCornerShape(35.dp),
-            shadowElevation = 20.dp
+            color = if (isDarkMode) Color.Black else Color.White,
+            shape = RoundedCornerShape(32.dp),
+            border = if (isDarkMode) BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)) else null
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 8.dp),
+                modifier = Modifier.fillMaxSize(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 items.forEachIndexed { index, item ->
-                    val isSelected = selectedIndex == index
+                    val isSelected = selectedItemIndex == index
 
                     val interactionSource = remember { MutableInteractionSource() }
                     val isPressed by interactionSource.collectIsPressedAsState()
                     val scale by animateFloatAsState(
-                        targetValue = if (isPressed) 0.85f else 1f,
+                        targetValue = if (isPressed) 0.9f else 1f,
                         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
                         label = "scale"
                     )
@@ -142,12 +142,12 @@ fun ModernFloatingBottomBar(selectedIndex: Int, onItemSelected: (Int) -> Unit, i
                         if (isDarkMode) {
                             if (isSelected) MainFamGold else Color(0xFF666666)
                         } else {
-                            if (isSelected) Color.White else Color.Black.copy(alpha = 0.6f)
+                            if (isSelected) Color(0xFF00A8FF) else Color(0xFF94A3B8)
                         },
                         label = "tint"
                     )
 
-                    Box(
+                    Column(
                         modifier = Modifier
                             .weight(1f)
                             .scale(scale)
@@ -156,38 +156,33 @@ fun ModernFloatingBottomBar(selectedIndex: Int, onItemSelected: (Int) -> Unit, i
                                 indication = null,
                                 onClick = { onItemSelected(index) }
                             ),
-                        contentAlignment = Alignment.Center
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        if (isSelected) {
-                            Box(
-                                modifier = Modifier
-                                    .width(60.dp)
-                                    .height(35.dp)
-                                    .background(
-                                        if(isDarkMode) MainFamGold.copy(alpha = 0.1f) 
-                                        else Color.White.copy(alpha = 0.2f), 
-                                        CircleShape
-                                    )
-                            )
-                        }
-
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Box(contentAlignment = Alignment.Center) {
+                            if (isSelected && !isDarkMode) {
+                                // Background pill for light mode selected icon
+                                Box(
+                                    modifier = Modifier
+                                        .size(width = 48.dp, height = 32.dp)
+                                        .background(Color(0xFF00A8FF).copy(alpha = 0.1f), CircleShape)
+                                )
+                            }
                             Icon(
                                 imageVector = item.icon,
                                 contentDescription = item.label,
                                 tint = tint,
-                                modifier = Modifier.size(26.dp)
+                                modifier = Modifier.size(24.dp)
                             )
-                            if (isSelected) {
-                                Text(
-                                    text = item.label,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = font,
-                                    color = tint
-                                )
-                            }
                         }
+                        Text(
+                            text = item.label,
+                            fontSize = 10.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            fontFamily = font,
+                            color = tint,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
                     }
                 }
             }
@@ -195,13 +190,10 @@ fun ModernFloatingBottomBar(selectedIndex: Int, onItemSelected: (Int) -> Unit, i
     }
 }
 
-@Preview(name = "Small Phone", device = "spec:width=360dp,height=640dp,dpi=480")
-@Preview(name = "Large Phone", device = "spec:width=411dp,height=891dp,dpi=420")
-@Preview(name = "Foldable", device = "spec:width=673dp,height=841dp,dpi=420")
-@Preview(name = "Ultra Small Phone", device = "spec:width=320dp,height=533dp,dpi=160")
+@Preview(name = "Light Mode", showBackground = true)
 @Composable
-fun MultiMainDevicePreview() {
+fun MultiMainDevicePreviewLight() {
     NexEntryTheme {
-        MainContainerScreen(isDarkMode = true, onThemeChange = {})
+        MainContainerScreen(isDarkMode = false, onThemeChange = {})
     }
 }

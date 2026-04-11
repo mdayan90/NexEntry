@@ -46,19 +46,23 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 
-// FamApp Style Palette
+// FamApp Style Palette (Dark Mode)
 val GuardFamDarkBg = Color(0xFF0A0A0A)
 val GuardFamSurface = Color(0xFF161616)
 val GuardFamGold = Color(0xFFE5C185)
 val GuardFamGreen = Color(0xFF00DC82)
 val GuardFamDivider = Color(0xFF262626)
 
+// Blue Gradient for Dark mode or specific actions
 val BlueVerticalGradient = Brush.verticalGradient(
-    listOf(
-        Color(0xFF00A8FF), // Top
-        Color(0xFF003366)  // Bottom
-    )
+    listOf(Color(0xFF00A8FF), Color(0xFF003366))
 )
+
+// Light Mode Palette (Based on screenshot)
+val LightBg = Color(0xFFF5F7FF)
+val LightBlueAction = Color(0xFF2563EB)
+val LightRedAction = Color(0xFFFEF2F2)
+val LightRedText = Color(0xFFEF4444)
 
 enum class DashboardPage {
     HOME, CHECK_IN, PENDING_DETAIL
@@ -103,58 +107,45 @@ fun DashboardHome(isDarkMode: Boolean, onCheckInClick: () -> Unit, onPendingClic
                 if (isDarkMode) {
                     Brush.verticalGradient(colors = listOf(Color(0xFF1A1612), GuardFamDarkBg))
                 } else {
-                    BlueVerticalGradient
+                    Brush.verticalGradient(listOf(Color.White, LightBg))
                 }
             )
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // App Name Centered at top
-            Spacer(modifier = Modifier.statusBarsPadding().height(16.dp))
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 100.dp)
+        ) {
+            item {
+                HeaderSectionFam(isOnline = isOnline, onToggle = { isOnline = it }, isDarkMode = isDarkMode)
+            }
+
+            item {
+                BentoGridFam(onCheckInClick = onCheckInClick, isDarkMode = isDarkMode)
+            }
+
+            item {
                 Text(
-                    text = "NexEntry",
-                    color = if (isDarkMode) GuardFamGold else Color.White,
-                    fontSize = 24.sp,
+                    text = "PENDING ACTIVITY",
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
+                    letterSpacing = 1.sp,
+                    color = if (isDarkMode) Color.White.copy(0.6f) else Color.Gray,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
                 )
             }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 100.dp)
-            ) {
-                item {
-                    HeaderSectionFam(isOnline = isOnline, onToggle = { isOnline = it }, isDarkMode = isDarkMode)
-                }
-
-                item {
-                    BentoGridFam(onCheckInClick = onCheckInClick, isDarkMode = isDarkMode)
-                }
-
-                item {
-                    Text(
-                        text = "Pending Activity",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = if (isDarkMode) Color.White else Color.Black,
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp)
-                    )
-                }
-
-                items(listOf(
-                    "Ayan Hashmi" to "B-401",
-                    "Sammer Khan" to "B-402",
-                    "Arsalan Khan" to "B-403"
-                )) { (name, flat) ->
-                    PendingRequestItemFam(
-                        name = name,
-                        flat = flat,
-                        time = "10:25 AM",
-                        isDarkMode = isDarkMode,
-                        onClick = { onPendingClick(name, flat) }
-                    )
-                }
+            items(listOf(
+                "Ayan Hashmi" to "B-401",
+                "Sammer Khan" to "B-402",
+                "Arsalan Khan" to "B-403"
+            )) { (name, flat) ->
+                PendingRequestItemFam(
+                    name = name,
+                    flat = flat,
+                    time = "10:25 AM",
+                    isDarkMode = isDarkMode,
+                    onClick = { onPendingClick(name, flat) }
+                )
             }
         }
     }
@@ -177,20 +168,14 @@ fun VisitorCheckInScreen(isDarkMode: Boolean, onBack: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                if (isDarkMode) {
-                    Brush.verticalGradient(colors = listOf(Color(0xFF1A1612), GuardFamDarkBg))
-                } else {
-                    BlueVerticalGradient
-                }
-            )
+            .background(if (isDarkMode) GuardFamDarkBg else LightBg)
     ) {
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(24.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBack, modifier = Modifier.background(if (isDarkMode) GuardFamSurface else Color(0xFFF1F5F9), CircleShape)) {
+                IconButton(onClick = onBack, modifier = Modifier.background(if (isDarkMode) GuardFamSurface else Color.White, CircleShape)) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = if (isDarkMode) Color.White else Color.Black)
                 }
                 Spacer(Modifier.width(16.dp))
@@ -200,14 +185,15 @@ fun VisitorCheckInScreen(isDarkMode: Boolean, onBack: () -> Unit) {
             Surface(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                 shape = RoundedCornerShape(28.dp),
-                color = if (isDarkMode) GuardFamSurface else Color(0xFFF8FAFC),
-                border = BorderStroke(1.dp, if (isDarkMode) Color.White.copy(alpha = 0.05f) else Color.Gray.copy(alpha = 0.1f))
+                color = if (isDarkMode) GuardFamSurface else Color.White,
+                shadowElevation = if (isDarkMode) 0.dp else 4.dp,
+                border = if (isDarkMode) BorderStroke(1.dp, Color.White.copy(alpha = 0.05f)) else null
             ) {
                 Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Visitor Information", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = if (isDarkMode) GuardFamGold else Color(0xFF1E293B))
+                        Text("Visitor Information", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = if (isDarkMode) GuardFamGold else Color.Black)
                         Box(
-                            modifier = Modifier.size(70.dp).clip(RoundedCornerShape(20.dp)).background(if (isDarkMode) GuardFamDarkBg else Color(0xFFF1F5F9)).border(1.dp, if (isDarkMode) GuardFamGold.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.1f), RoundedCornerShape(20.dp))
+                            modifier = Modifier.size(70.dp).clip(RoundedCornerShape(20.dp)).background(if (isDarkMode) GuardFamDarkBg else Color(0xFFF1F5F9)).border(1.dp, if (isDarkMode) GuardFamGold.copy(alpha = 0.3f) else Color.Transparent, RoundedCornerShape(20.dp))
                                 .clickable {
                                     if (cameraPermissionState.status.isGranted) cameraLauncher.launch()
                                     else cameraPermissionState.launchPermissionRequest()
@@ -226,20 +212,16 @@ fun VisitorCheckInScreen(isDarkMode: Boolean, onBack: () -> Unit) {
 
                     Spacer(Modifier.height(8.dp))
                     
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .clip(CircleShape)
-                            .background(if (isDarkMode) Color(0xFF1C1C1C) else Color(0xFF00a8ff))
-                            .clickable { onBack() },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            "Register & Notify",
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White 
+                    Button(
+                        onClick = { onBack() },
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isDarkMode) Color(0xFF1C1C1C) else LightBlueAction,
+                            contentColor = if (isDarkMode) GuardFamGold else Color.White
                         )
+                    ) {
+                        Text("Register & Notify", fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -256,10 +238,10 @@ fun FamInputField(value: String, onValueChange: (String) -> Unit, label: String,
         shape = RoundedCornerShape(16.dp),
         leadingIcon = { Icon(icon, null, tint = if (isDarkMode) GuardFamGold.copy(alpha = 0.7f) else Color.Black) },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = if (isDarkMode) GuardFamGold else Color(0xFF00a8ff),
+            focusedBorderColor = if (isDarkMode) GuardFamGold else LightBlueAction,
             unfocusedBorderColor = Color.Transparent,
-            focusedContainerColor = if (isDarkMode) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.03f),
-            unfocusedContainerColor = if (isDarkMode) Color.White.copy(alpha = 0.03f) else Color.Black.copy(alpha = 0.01f),
+            focusedContainerColor = if (isDarkMode) Color.White.copy(alpha = 0.05f) else Color(0xFFF1F5F9),
+            unfocusedContainerColor = if (isDarkMode) Color.White.copy(alpha = 0.03f) else Color(0xFFF1F5F9),
             focusedTextColor = if (isDarkMode) Color.White else Color.Black,
             unfocusedTextColor = if (isDarkMode) Color.White else Color.Black
         )
@@ -271,17 +253,11 @@ fun ActivityDetailScreen(isDarkMode: Boolean, name: String, flat: String, onBack
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                if (isDarkMode) {
-                    Brush.verticalGradient(colors = listOf(Color(0xFF1A1612), GuardFamDarkBg))
-                } else {
-                    BlueVerticalGradient
-                }
-            )
+            .background(if (isDarkMode) GuardFamDarkBg else LightBg)
             .statusBarsPadding()
     ) {
         Row(modifier = Modifier.fillMaxWidth().padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack, modifier = Modifier.background(if (isDarkMode) GuardFamSurface else Color(0xFFF1F5F9), CircleShape)) {
+            IconButton(onClick = onBack, modifier = Modifier.background(if (isDarkMode) GuardFamSurface else Color.White, CircleShape)) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = if (isDarkMode) Color.White else Color.Black)
             }
             Spacer(Modifier.width(16.dp))
@@ -291,8 +267,9 @@ fun ActivityDetailScreen(isDarkMode: Boolean, name: String, flat: String, onBack
         Surface(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
             shape = RoundedCornerShape(28.dp),
-            color = if (isDarkMode) GuardFamSurface else Color(0xFFF8FAFC),
-            border = BorderStroke(1.dp, if (isDarkMode) Color.White.copy(alpha = 0.05f) else Color.Gray.copy(alpha = 0.1f))
+            color = if (isDarkMode) GuardFamSurface else Color.White,
+            shadowElevation = if (isDarkMode) 0.dp else 4.dp,
+            border = if (isDarkMode) BorderStroke(1.dp, Color.White.copy(alpha = 0.05f)) else null
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -313,19 +290,21 @@ fun ActivityDetailScreen(isDarkMode: Boolean, name: String, flat: String, onBack
 
                 Spacer(Modifier.height(40.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(50.dp)
-                            .border(1.dp, if (isDarkMode) GuardFamGold else Color(0xFF22C55E), CircleShape)
-                            .clip(CircleShape)
-                            .clickable { onBack() },
-                        contentAlignment = Alignment.Center
+                    Button(
+                        onClick = onBack, 
+                        modifier = Modifier.weight(1f).height(50.dp), 
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = if (isDarkMode) Color.Transparent else Color(0xFFDCFCE7))
                     ) {
-                        Text("Call Owner", color = if (isDarkMode) GuardFamGold else Color(0xFF22C55E), fontWeight = FontWeight.Bold)
+                        Text("Call Owner", color = if (isDarkMode) GuardFamGold else Color(0xFF16A34A), fontWeight = FontWeight.Bold)
                     }
-                    Button(onClick = onBack, modifier = Modifier.weight(1f).height(50.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444).copy(alpha = 0.1f), contentColor = Color(0xFFEF4444))) {
-                        Text("Reject")
+                    Button(
+                        onClick = onBack, 
+                        modifier = Modifier.weight(1f).height(50.dp), 
+                        shape = CircleShape, 
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFEF2F2), contentColor = Color.Red)
+                    ) {
+                        Text("Reject", fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -346,18 +325,36 @@ fun HeaderSectionFam(isOnline: Boolean, onToggle: (Boolean) -> Unit, isDarkMode:
         modifier = Modifier.fillMaxWidth().padding(24.dp).padding(top = 16.dp),
         shape = RoundedCornerShape(32.dp),
         color = if (isDarkMode) GuardFamSurface else Color.White,
-        border = BorderStroke(1.dp, if (isDarkMode) Color.White.copy(alpha = 0.05f) else Color.Gray.copy(alpha = 0.1f)),
         shadowElevation = if (isDarkMode) 0.dp else 4.dp
     ) {
-        Row(modifier = Modifier.padding(24.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column {
-                Text("DASHBOARD", color = if (isDarkMode) GuardFamGold else Color(0xFF00a8ff), fontSize = 11.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
-                Text("Hi, Hashmi", color = if (isDarkMode) Color.White else Color.Black, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(modifier = Modifier.size(10.dp).background(if(isOnline) GuardFamGreen else Color.Red, CircleShape))
+        Column(modifier = Modifier.padding(24.dp)) {
+            Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Column {
+                    Surface(color = if(isDarkMode) GuardFamGold.copy(0.1f) else Color(0xFFE0E7FF), shape = CircleShape) {
+                        Text("DASHBOARD", color = if (isDarkMode) GuardFamGold else Color(0xFF4F46E5), fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Text("Hi, Hashmi 👋", color = if (isDarkMode) Color.White else Color.Black, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
+                }
                 Switch(checked = isOnline, onCheckedChange = onToggle, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = GuardFamGreen))
             }
+            Spacer(Modifier.height(16.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                StatusChip("Gate Open", Color(0xFFDCFCE7), Color(0xFF16A34A))
+                StatusChip("3 Pending", Color(0xFFFEF3C7), Color(0xFFD97706))
+                StatusChip("Flat B-401", Color(0xFFF1F5F9), Color.Gray)
+            }
+        }
+    }
+}
+
+@Composable
+fun StatusChip(text: String, bg: Color, fg: Color) {
+    Surface(color = bg, shape = CircleShape) {
+        Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier.size(6.dp).background(fg, CircleShape))
+            Spacer(Modifier.width(6.dp))
+            Text(text, color = fg, fontSize = 10.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -365,48 +362,66 @@ fun HeaderSectionFam(isOnline: Boolean, onToggle: (Boolean) -> Unit, isDarkMode:
 @Composable
 fun BentoGridFam(onCheckInClick: () -> Unit, isDarkMode: Boolean) {
     Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+        Text("QUICK ACTIONS", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Gray, letterSpacing = 1.sp, modifier = Modifier.padding(bottom = 12.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Box(
-                modifier = Modifier
-                    .weight(1.4f)
-                    .height(140.dp)
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(if (isDarkMode) Brush.linearGradient(listOf(Color(0xFF1C1814), Color(0xFF1C1814))) else BlueVerticalGradient)
-                    .clickable { onCheckInClick() }
-                    .padding(20.dp)
+            // Check-in (Solid Blue in Light mode)
+            Surface(
+                modifier = Modifier.weight(1.2f).height(140.dp).clickable { onCheckInClick() },
+                shape = RoundedCornerShape(28.dp),
+                color = if (isDarkMode) Color(0xFF1C1814) else LightBlueAction,
+                shadowElevation = if (isDarkMode) 0.dp else 8.dp
             ) {
-                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-                    Box(modifier = Modifier.size(36.dp).background(if(isDarkMode) GuardFamGold.copy(0.1f) else Color.White.copy(0.2f), CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Add, null, tint = if(isDarkMode) GuardFamGold else Color.White, modifier = Modifier.size(20.dp)) }
+                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.SpaceBetween) {
+                    Box(modifier = Modifier.size(36.dp).background(if(isDarkMode) GuardFamGold.copy(0.1f) else Color.White.copy(0.2f), CircleShape), contentAlignment = Alignment.Center) { 
+                        Icon(Icons.Default.PersonAdd, null, tint = if(isDarkMode) GuardFamGold else Color.White, modifier = Modifier.size(20.dp)) 
+                    }
                     Column {
                         Text("Check-in", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = if(isDarkMode) GuardFamGold else Color.White)
-                        Text("Add Visitor", fontSize = 11.sp, color = if(isDarkMode) Color.Gray else Color.White.copy(alpha = 0.7f))
+                        Text("Add visitor", fontSize = 11.sp, color = if(isDarkMode) Color.Gray else Color.White.copy(alpha = 0.7f))
                     }
                 }
             }
-            BentoTileFam("Logs", "History", Icons.Default.History, Modifier.weight(1f), if (isDarkMode) GuardFamSurface else Color.White, if (isDarkMode) Color.White else Color.Black, {}, isDarkMode)
+            BentoTileFam("Logs", "View history", Icons.Default.Assignment, Modifier.weight(1f), isDarkMode)
         }
         Spacer(Modifier.height(16.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            BentoTileFam("SOS", "Panic", Icons.Default.Warning, Modifier.weight(1f), if (isDarkMode) GuardFamSurface else Color.White, Color(0xFFEF4444), {}, isDarkMode)
-            BentoTileFam("Society", "Rules", Icons.Default.Info, Modifier.weight(1.2f), if (isDarkMode) GuardFamSurface else Color.White, if (isDarkMode) Color.White else Color.Black, {}, isDarkMode)
+            BentoTileFam("Society", "Rules & Info", Icons.Default.Domain, Modifier.weight(1f), isDarkMode)
+            // SOS Tile
+            Surface(
+                modifier = Modifier.weight(1f).height(140.dp).clickable { },
+                shape = RoundedCornerShape(28.dp),
+                color = if (isDarkMode) GuardFamSurface else LightRedAction,
+                border = if (isDarkMode) BorderStroke(1.dp, Color.White.copy(alpha = 0.05f)) else null
+            ) {
+                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.SpaceBetween) {
+                    Box(modifier = Modifier.size(36.dp).background(if(isDarkMode) Color.Red.copy(0.1f) else Color.White, CircleShape), contentAlignment = Alignment.Center) { 
+                        Icon(Icons.Default.Warning, null, tint = Color.Red, modifier = Modifier.size(20.dp)) 
+                    }
+                    Column {
+                        Text("SOS", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = if(isDarkMode) Color.Red else LightRedText)
+                        Text("Panic alert", fontSize = 11.sp, color = Color.Gray)
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun BentoTileFam(title: String, sub: String, icon: ImageVector, modifier: Modifier, bg: Color, fg: Color, onClick: () -> Unit, isDarkMode: Boolean) {
+fun BentoTileFam(title: String, sub: String, icon: ImageVector, modifier: Modifier, isDarkMode: Boolean) {
     Surface(
-        modifier = modifier.height(140.dp).clickable { onClick() },
+        modifier = modifier.height(140.dp).clickable { },
         shape = RoundedCornerShape(28.dp),
-        color = bg,
-        border = BorderStroke(1.dp, if (isDarkMode) Color.White.copy(alpha = 0.05f) else Color.Gray.copy(alpha = 0.1f)),
+        color = if (isDarkMode) GuardFamSurface else Color.White,
         shadowElevation = if (isDarkMode) 0.dp else 4.dp
     ) {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.SpaceBetween) {
-            Box(modifier = Modifier.size(36.dp).background(fg.copy(0.1f), CircleShape), contentAlignment = Alignment.Center) { Icon(icon, null, tint = fg, modifier = Modifier.size(20.dp)) }
+            Box(modifier = Modifier.size(36.dp).background(if(isDarkMode) Color.White.copy(0.05f) else Color(0xFFF1F5F9), CircleShape), contentAlignment = Alignment.Center) { 
+                Icon(icon, null, tint = if(isDarkMode) Color.White else Color.Gray, modifier = Modifier.size(20.dp)) 
+            }
             Column {
-                Text(title, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = fg)
-                Text(sub, fontSize = 11.sp, color = if (isDarkMode) Color.Gray else Color.Gray.copy(0.8f))
+                Text(title, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = if(isDarkMode) Color.White else Color.Black)
+                Text(sub, fontSize = 11.sp, color = Color.Gray)
             }
         }
     }
@@ -418,19 +433,20 @@ fun PendingRequestItemFam(name: String, flat: String, time: String, isDarkMode: 
         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp).clickable { onClick() },
         shape = RoundedCornerShape(24.dp),
         color = if (isDarkMode) GuardFamSurface else Color.White,
-        border = BorderStroke(1.dp, if (isDarkMode) Color.White.copy(alpha = 0.05f) else Color.Gray.copy(alpha = 0.1f)),
-        shadowElevation = if (isDarkMode) 0.dp else 2.dp
+        shadowElevation = if (isDarkMode) 0.dp else 4.dp
     ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(modifier = Modifier.size(44.dp), color = if (isDarkMode) GuardFamDarkBg else Color(0xFFF1F5F9), shape = CircleShape) {
-                Icon(Icons.Default.Person, null, tint = if (isDarkMode) Color.Gray else Color.Black, modifier = Modifier.padding(10.dp))
+            Surface(modifier = Modifier.size(48.dp), color = if (isDarkMode) GuardFamDarkBg else Color(0xFFE0E7FF), shape = CircleShape) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(name.take(2).uppercase(), color = if (isDarkMode) GuardFamGold else Color(0xFF4F46E5), fontWeight = FontWeight.Bold)
+                }
             }
             Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = if (isDarkMode) Color.White else Color.Black)
-                Text("Flat $flat • $time", fontSize = 12.sp, color = Color.Gray)
+                Text("$flat • $time • Visitor", fontSize = 12.sp, color = Color.Gray)
             }
-            Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, null, modifier = Modifier.size(14.dp), tint = Color.Gray)
+            Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, null, modifier = Modifier.size(14.dp), tint = Color.LightGray)
         }
     }
 }
@@ -438,5 +454,5 @@ fun PendingRequestItemFam(name: String, flat: String, time: String, isDarkMode: 
 @Preview(showBackground = true)
 @Composable
 fun GuardFamPreview() {
-    NexEntryTheme { GuardDashboardScreen(isDarkMode = true) }
+    NexEntryTheme { GuardDashboardScreen(isDarkMode = false) }
 }
