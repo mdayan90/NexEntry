@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -45,18 +46,26 @@ data class NavItem(
 val MainFamDarkBg = Color(0xFF0A0A0A)
 val MainFamGold = Color(0xFFE5C185)
 
-// Requested Blue Vertical Gradient for Dark Background or Light context
-val MainBlueGradientEffect = Brush.verticalGradient(
-    listOf(
-        Color(0xFF00A8FF), // Top
-        Color(0xFF003366)  // Bottom
-    )
-)
-
 @Composable
 fun MainContainerScreen(isDarkMode: Boolean, onThemeChange: (Boolean) -> Unit) {
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
     val regularFont = FontFamily(Font(R.font.regular))
+
+    // Define the background brush based on the theme
+    val containerBackgroundBrush = if (isDarkMode) {
+        Brush.verticalGradient(
+            colors = listOf(Color(0xFF1A1612), MainFamDarkBg),
+            startY = 0f,
+            endY = 1000f
+        )
+    } else {
+        // Light theme background matches Dashboard
+        Brush.verticalGradient(
+            colors = listOf(Color(0xFFE0F2FE), Color.White),
+            startY = 0f,
+            endY = 1000f
+        )
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -73,18 +82,7 @@ fun MainContainerScreen(isDarkMode: Boolean, onThemeChange: (Boolean) -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    if (isDarkMode) {
-                        Brush.verticalGradient(
-                            colors = listOf(Color(0xFF1A1612), MainFamDarkBg),
-                            startY = 0f,
-                            endY = 1000f
-                        )
-                    } else {
-                        // Light theme background from screenshot
-                        Color(0xFFF5F7FF)
-                    }
-                )
+                .background(containerBackgroundBrush)
                 .padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             when (selectedItemIndex) {
@@ -106,83 +104,99 @@ fun ModernFloatingBottomBar(selectedIndex: Int, onItemSelected: (Int) -> Unit, i
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding() 
-            .padding(horizontal = 48.dp, vertical = 24.dp),
+            .padding(horizontal = 32.dp, vertical = 24.dp),
         contentAlignment = Alignment.Center
     ) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp)
-                .shadow(
-                    elevation = if (isDarkMode) 0.dp else 12.dp,
-                    shape = RoundedCornerShape(32.dp),
-                    spotColor = Color(0xFF00A8FF).copy(alpha = 0.2f)
-                ),
-            color = if (isDarkMode) Color.Black else Color.White,
-            shape = RoundedCornerShape(32.dp),
-            border = if (isDarkMode) BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)) else null
+                .height(72.dp),
+            // Bottom bar: BLACK in dark mode, BLUE GRADIENT in light mode
+            color = Color.Transparent,
+            shape = RoundedCornerShape(35.dp),
+            shadowElevation = if (isDarkMode) 0.dp else 15.dp
         ) {
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        if (isDarkMode) Brush.linearGradient(listOf(Color.Black, Color.Black)) 
+                        else Brush.verticalGradient(listOf(Color(0xFF00A8FF), Color(0xFF003366)))
+                    )
+                    .border(
+                        width = 1.dp, 
+                        color = if (isDarkMode) Color.White.copy(alpha = 0.1f) else Color.White.copy(alpha = 0.2f), 
+                        shape = RoundedCornerShape(35.dp)
+                    )
             ) {
-                items.forEachIndexed { index, item ->
-                    val isSelected = selectedItemIndex == index
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    items.forEachIndexed { index, item ->
+                        val isSelected = selectedIndex == index
 
-                    val interactionSource = remember { MutableInteractionSource() }
-                    val isPressed by interactionSource.collectIsPressedAsState()
-                    val scale by animateFloatAsState(
-                        targetValue = if (isPressed) 0.9f else 1f,
-                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-                        label = "scale"
-                    )
+                        val interactionSource = remember { MutableInteractionSource() }
+                        val isPressed by interactionSource.collectIsPressedAsState()
+                        val scale by animateFloatAsState(
+                            targetValue = if (isPressed) 0.85f else 1f,
+                            animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                            label = "scale"
+                        )
 
-                    val tint by animateColorAsState(
-                        if (isDarkMode) {
-                            if (isSelected) MainFamGold else Color(0xFF666666)
-                        } else {
-                            if (isSelected) Color(0xFF00A8FF) else Color(0xFF94A3B8)
-                        },
-                        label = "tint"
-                    )
+                        val tint by animateColorAsState(
+                            if (isDarkMode) {
+                                if (isSelected) MainFamGold else Color(0xFF666666)
+                            } else {
+                                // Light Mode: Selected White, Unselected Black
+                                if (isSelected) Color.White else Color.Black.copy(alpha = 0.6f)
+                            },
+                            label = "tint"
+                        )
 
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .scale(scale)
-                            .clickable(
-                                interactionSource = interactionSource,
-                                indication = null,
-                                onClick = { onItemSelected(index) }
-                            ),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            if (isSelected && !isDarkMode) {
-                                // Background pill for light mode selected icon
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .scale(scale)
+                                .clickable(
+                                    interactionSource = interactionSource,
+                                    indication = null,
+                                    onClick = { onItemSelected(index) }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (isSelected) {
                                 Box(
                                     modifier = Modifier
-                                        .size(width = 48.dp, height = 32.dp)
-                                        .background(Color(0xFF00A8FF).copy(alpha = 0.1f), CircleShape)
+                                        .width(60.dp)
+                                        .height(35.dp)
+                                        .background(
+                                            if(isDarkMode) MainFamGold.copy(alpha = 0.1f) 
+                                            else Color.White.copy(alpha = 0.15f), 
+                                            CircleShape
+                                        )
                                 )
                             }
-                            Icon(
-                                imageVector = item.icon,
-                                contentDescription = item.label,
-                                tint = tint,
-                                modifier = Modifier.size(24.dp)
-                            )
+
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = item.label,
+                                    tint = tint,
+                                    modifier = Modifier.size(26.dp)
+                                )
+                                if (isSelected) {
+                                    Text(
+                                        text = item.label,
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = font,
+                                        color = tint
+                                    )
+                                }
+                            }
                         }
-                        Text(
-                            text = item.label,
-                            fontSize = 10.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                            fontFamily = font,
-                            color = tint,
-                            modifier = Modifier.padding(top = 2.dp)
-                        )
                     }
                 }
             }
@@ -192,7 +206,7 @@ fun ModernFloatingBottomBar(selectedIndex: Int, onItemSelected: (Int) -> Unit, i
 
 @Preview(name = "Light Mode", showBackground = true)
 @Composable
-fun MultiMainDevicePreviewLight() {
+fun MultiMainDevicePreview() {
     NexEntryTheme {
         MainContainerScreen(isDarkMode = false, onThemeChange = {})
     }
