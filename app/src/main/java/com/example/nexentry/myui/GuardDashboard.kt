@@ -53,11 +53,12 @@ val GuardFamSurface = Color(0xFF161616)
 val GuardFamGold = Color(0xFFE5C185)
 val GuardFamGreen = Color(0xFF00DC82)
 val GuardFamDivider = Color(0xFF262626)
+val Nexentry_color = Color(0xFF0434AD)
 
 val BlueVerticalGradient = Brush.verticalGradient(
     listOf(
-        Color(0xFF00A8FF), // Top
-        Color(0xFF003366)  // Bottom
+        Color(0xFFD8EBF6), // Top
+        Color(0xFFF6F6F6)  // Bottom
     )
 )
 
@@ -114,7 +115,7 @@ fun DashboardHome(isDarkMode: Boolean, onCheckInClick: () -> Unit, onPendingClic
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(
                     text = "NexEntry",
-                    color = if (isDarkMode) GuardFamGold else Color.White,
+                    color = if (isDarkMode) GuardFamGold else Nexentry_color,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
@@ -233,7 +234,7 @@ fun VisitorCheckInScreen(isDarkMode: Boolean, onBack: () -> Unit) {
                             .fillMaxWidth()
                             .height(56.dp)
                             .clip(CircleShape)
-                            .background(if (isDarkMode) Brush.linearGradient(listOf(Color(0xFF1C1C1C), Color(0xFF1C1C1C))) else BlueVerticalGradient)
+                            .background(if (isDarkMode) Brush.linearGradient(listOf(Color(0xFF1C1C1C), Color(0xFF1C1C1C))) else Nexentry_color)
                             .clickable { onBack() },
                         contentAlignment = Alignment.Center
                     ) {
@@ -272,8 +273,8 @@ fun FamInputField(value: String, onValueChange: (String) -> Unit, label: String,
 fun ActivityDetailScreen(isDarkMode: Boolean, name: String, flat: String, onBack: () -> Unit) {
     val lightGreenAction = Color(0xFFDCFCE7)
     val lightGreenText = Color(0xFF16A34A)
-    val lightRedAction = Color(0xFFFEF2F2)
-    val lightRedText = Color(0xFFEF4444)
+    val lightRedAction = Color(0xFFFD0101)
+    val lightRedText = Color(0xFFFF0000)
 
     Column(
         modifier = Modifier
@@ -369,7 +370,7 @@ fun HeaderSectionFam(isOnline: Boolean, onToggle: (Boolean) -> Unit, isDarkMode:
                         Text("DASHBOARD", color = if (isDarkMode) GuardFamGold else Color(0xFF4F46E5), fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
                     }
                     Spacer(Modifier.height(8.dp))
-                    Text("Hi, Hashmi 👋", color = if (isDarkMode) Color.White else Color.Black, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
+                    Text("Hi, Hashmi", color = if (isDarkMode) Color.White else Color.Black, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
                 }
                 Switch(checked = isOnline, onCheckedChange = onToggle, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = GuardFamGreen))
             }
@@ -425,7 +426,7 @@ fun BentoGridFam(onCheckInClick: () -> Unit, isDarkMode: Boolean) {
             Surface(
                 modifier = Modifier.weight(1f).height(140.dp).clickable { },
                 shape = RoundedCornerShape(28.dp),
-                color = if (isDarkMode) GuardFamSurface else Color.Red,
+                color = if (isDarkMode) GuardFamSurface else Color.White,
                 border = if (isDarkMode) BorderStroke(1.dp, Color.White.copy(alpha = 0.05f)) else null
             ) {
                 Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.SpaceBetween) {
@@ -492,6 +493,6 @@ fun PendingRequestItemFam(name: String, flat: String, time: String, isDarkMode: 
 @Composable
 fun MultiGuardDevicesPreview() {
     NexEntryTheme {
-        GuardDashboardScreen(isDarkMode = true)
+        GuardDashboardScreen(isDarkMode = false)
     }
 }
