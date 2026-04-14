@@ -234,7 +234,7 @@ fun VisitorCheckInScreen(isDarkMode: Boolean, onBack: () -> Unit) {
                             .fillMaxWidth()
                             .height(56.dp)
                             .clip(CircleShape)
-                            .background(if (isDarkMode) Brush.linearGradient(listOf(Color(0xFF1C1C1C), Color(0xFF1C1C1C))) else Nexentry_color)
+                            .background(if (isDarkMode) Color(0xFF1C1C1C) else Nexentry_color)
                             .clickable { onBack() },
                         contentAlignment = Alignment.Center
                     ) {
@@ -274,7 +274,7 @@ fun ActivityDetailScreen(isDarkMode: Boolean, name: String, flat: String, onBack
     val lightGreenAction = Color(0xFFDCFCE7)
     val lightGreenText = Color(0xFF16A34A)
     val lightRedAction = Color(0xFFFD0101)
-    val lightRedText = Color(0xFFFF0000)
+    val lightRedText = Color(0xFFFFFFFF)
 
     Column(
         modifier = Modifier
@@ -491,7 +491,7 @@ fun PendingRequestItemFam(name: String, flat: String, time: String, isDarkMode: 
 @Preview(name = "Large Phone", device = "spec:width=411dp,height=891dp,dpi=420")
 @Preview(name = "Foldable", device = "spec:width=673dp,height=841dp,dpi=420")
 @Composable
-fun MultiGuardDevicesPreview() {
+fun MultiGuardDevicePreview() {
     NexEntryTheme {
         GuardDashboardScreen(isDarkMode = false)
     }
