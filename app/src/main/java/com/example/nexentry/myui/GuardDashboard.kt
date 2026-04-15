@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -112,26 +113,32 @@ fun DashboardHome(isDarkMode: Boolean, onCheckInClick: () -> Unit, onPendingClic
         Column(modifier = Modifier.fillMaxSize()) {
             // App Name Centered at top
             Spacer(modifier = Modifier.statusBarsPadding().height(16.dp))
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = "NexEntry",
-                    color = if (isDarkMode) GuardFamGold else Nexentry_color,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
-                )
-            }
+//            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+//
+//            }
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 100.dp)
             ) {
                 item {
+                    Text(
+                        text = "NexEntry",
+                        modifier = Modifier.fillMaxWidth(),
+                        color = if (isDarkMode) GuardFamGold else Nexentry_color,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                item {
                     HeaderSectionFam(isOnline = isOnline, onToggle = { isOnline = it }, isDarkMode = isDarkMode)
                 }
 
                 item {
-                    BentoGridFam(onCheckInClick = onCheckInClick, isDarkMode = isDarkMode)
+                    BentoGridFam(onCheckInClick = onCheckInClick,  isDarkMode = isDarkMode)
                 }
 
                 item {
