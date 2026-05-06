@@ -30,10 +30,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nexentry.R
 import com.example.nexentry.ui.theme.NexEntryTheme
+import com.example.nexentry.ui.theme.PrimaryBlue
+import com.example.nexentry.ui.theme.SecondaryBlue
+import com.example.nexentry.ui.theme.TertiaryBlue
+import com.example.nexentry.ui.theme.DarkBackground
 
 // FamApp Style Palette
-val FamDarkBg = Color(0xFF0A0A0A)
-val FamSurface = Color(0xFF161616)
+val FamDarkBg = DarkBackground
+val FamSurface = TertiaryBlue
 val FamGold = Color(0xFFE5C185)
 val FamGreen = Color(0xFF00DC82)
 val FamDivider = Color(0xFF262626)

@@ -40,11 +40,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nexentry.R
 import com.example.nexentry.ui.theme.NexEntryTheme
+import com.example.nexentry.ui.theme.PrimaryBlue
+import com.example.nexentry.ui.theme.SecondaryBlue
+import com.example.nexentry.ui.theme.TertiaryBlue
+import com.example.nexentry.ui.theme.DarkBackground
 
 // Palette using the app's primary blue
-val AppPrimaryBlue = Color(0xFF003366)
-val LoginBgStart = Color(0xFF003366)
-val LoginBgEnd = Color(0xFF00a8ff)
+val AppPrimaryBlue = PrimaryBlue
+val LoginBgStart = PrimaryBlue
+val LoginBgEnd = SecondaryBlue
 val LoginWhite = Color(0xFFFFFFFF)
 val LoginGrayText = Color(0xFF64748B)
 

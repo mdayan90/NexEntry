@@ -44,22 +44,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nexentry.R
 import com.example.nexentry.ui.theme.NexEntryTheme
+import com.example.nexentry.ui.theme.PrimaryBlue
+import com.example.nexentry.ui.theme.SecondaryBlue
+import com.example.nexentry.ui.theme.TertiaryBlue
+import com.example.nexentry.ui.theme.DarkBackground
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 
-// FamApp Style Palette
-val GuardFamDarkBg = Color(0xFF0A0A0A)
-val GuardFamSurface = Color(0xFF161616)
+// Palette using the app's new blue theme
+val GuardFamDarkBg = DarkBackground
+val GuardFamSurface = TertiaryBlue
 val GuardFamGold = Color(0xFFE5C185)
 val GuardFamGreen = Color(0xFF00DC82)
 val GuardFamDivider = Color(0xFF262626)
-val Nexentry_color = Color(0xFF0434AD)
+val Nexentry_color = PrimaryBlue
 
 val BlueVerticalGradient = Brush.verticalGradient(
     listOf(
-        Color(0xFFD8EBF6), // Top
-        Color(0xFFF6F6F6)  // Bottom
+        PrimaryBlue.copy(alpha = 0.1f), // Top
+        Color.White  // Bottom
     )
 )
 
@@ -104,7 +108,7 @@ fun DashboardHome(isDarkMode: Boolean, onCheckInClick: () -> Unit, onPendingClic
             .fillMaxSize()
             .background(
                 if (isDarkMode) {
-                    Brush.verticalGradient(colors = listOf(Color(0xFF1A1612), GuardFamDarkBg))
+                    Brush.linearGradient(listOf(Color(0xFF0A0A0A), Color(0xFF0A0A0A)))
                 } else {
                     BlueVerticalGradient
                 }
@@ -113,9 +117,7 @@ fun DashboardHome(isDarkMode: Boolean, onCheckInClick: () -> Unit, onPendingClic
         Column(modifier = Modifier.fillMaxSize()) {
             // App Name Centered at top
             Spacer(modifier = Modifier.statusBarsPadding().height(16.dp))
-//            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-//
-//            }
+
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -189,7 +191,7 @@ fun VisitorCheckInScreen(isDarkMode: Boolean, onBack: () -> Unit) {
             .fillMaxSize()
             .background(
                 if (isDarkMode) {
-                    Brush.verticalGradient(listOf(Color(0xFF1A1612), GuardFamDarkBg))
+                    Brush.linearGradient(listOf(Color(0xFF0A0A0A), Color(0xFF0A0A0A)))
                 } else {
                     BlueVerticalGradient
                 }
@@ -288,7 +290,7 @@ fun ActivityDetailScreen(isDarkMode: Boolean, name: String, flat: String, onBack
             .fillMaxSize()
             .background(
                 if (isDarkMode) {
-                    Brush.verticalGradient(colors = listOf(Color(0xFF1A1612), GuardFamDarkBg))
+                    Brush.linearGradient(listOf(Color(0xFF0A0A0A), Color(0xFF0A0A0A)))
                 } else {
                     BlueVerticalGradient
                 }
@@ -406,27 +408,30 @@ fun StatusChip(text: String, bg: Color, fg: Color) {
 fun BentoGridFam(onCheckInClick: () -> Unit, isDarkMode: Boolean) {
     Column(modifier = Modifier.padding(horizontal = 24.dp)) {
         Text("QUICK ACTIONS", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Gray, letterSpacing = 1.sp, modifier = Modifier.padding(bottom = 12.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            // Check-in (Solid Blue in Light mode)
-            Surface(
-                modifier = Modifier.weight(1.2f).height(140.dp).clickable { onCheckInClick() },
-                shape = RoundedCornerShape(28.dp),
-                color = if (isDarkMode) Color(0xFF1C1814) else Color(0xFF2563EB),
-                shadowElevation = if (isDarkMode) 0.dp else 8.dp
-            ) {
-                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.SpaceBetween) {
-                    Box(modifier = Modifier.size(36.dp).background(if(isDarkMode) GuardFamGold.copy(0.1f) else Color.White.copy(0.2f), CircleShape), contentAlignment = Alignment.Center) { 
-                        Icon(Icons.Default.PersonAdd, null, tint = if(isDarkMode) GuardFamGold else Color.White, modifier = Modifier.size(20.dp)) 
-                    }
-                    Column {
-                        Text("Check-in", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = if(isDarkMode) GuardFamGold else Color.White)
-                        Text("Add visitor", fontSize = 11.sp, color = if(isDarkMode) Color.Gray else Color.White.copy(alpha = 0.7f))
-                    }
+        
+        // Check-in (Full Width)
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp)
+                .clickable { onCheckInClick() },
+            shape = RoundedCornerShape(28.dp),
+            color = if (isDarkMode) Color(0xFF121212) else Color(0xFF2563EB),
+            shadowElevation = if (isDarkMode) 0.dp else 8.dp
+        ) {
+            Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.SpaceBetween) {
+                Box(modifier = Modifier.size(36.dp).background(if(isDarkMode) GuardFamGold.copy(0.1f) else Color.White.copy(0.2f), CircleShape), contentAlignment = Alignment.Center) { 
+                    Icon(Icons.Default.PersonAdd, null, tint = if(isDarkMode) GuardFamGold else Color.White, modifier = Modifier.size(20.dp)) 
+                }
+                Column {
+                    Text("Check-in", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = if(isDarkMode) GuardFamGold else Color.White)
+                    Text("Add visitor", fontSize = 11.sp, color = if(isDarkMode) Color.Gray else Color.White.copy(alpha = 0.7f))
                 }
             }
-            BentoTileFam("Logs", "View history", Icons.AutoMirrored.Filled.Assignment, Modifier.weight(1f), isDarkMode)
         }
+        
         Spacer(Modifier.height(16.dp))
+
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             BentoTileFam("Society", "Rules & Info", Icons.Default.Domain, Modifier.weight(1f), isDarkMode)
             // SOS Tile
@@ -494,12 +499,12 @@ fun PendingRequestItemFam(name: String, flat: String, time: String, isDarkMode: 
     }
 }
 
-@Preview(name = "Small Phone", device = "spec:width=360dp,height=640dp,dpi=480")
+@Preview(name = "Small Phones", device = "spec:width=360dp,height=640dp,dpi=480")
 @Preview(name = "Large Phone", device = "spec:width=411dp,height=891dp,dpi=420")
 @Preview(name = "Foldable", device = "spec:width=673dp,height=841dp,dpi=420")
 @Composable
 fun MultiGuardDevicePreview() {
     NexEntryTheme {
-        GuardDashboardScreen(isDarkMode = false)
+        GuardDashboardScreen(isDarkMode = true)
     }
 }

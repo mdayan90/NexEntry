@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -33,7 +34,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nexentry.R
+import com.example.nexentry.ui.theme.DarkBackground
 import com.example.nexentry.ui.theme.NexEntryTheme
+import com.example.nexentry.ui.theme.PrimaryBlue
+import com.example.nexentry.ui.theme.SecondaryBlue
 
 // NavItem model
 data class NavItem(
@@ -43,7 +47,7 @@ data class NavItem(
 )
 
 // Using FamApp Style Palette
-val MainFamDarkBg = Color(0xFF0A0A0A)
+val MainFamDarkBg = DarkBackground
 val MainFamGold = Color(0xFFE5C185)
 
 @Composable
@@ -53,15 +57,13 @@ fun MainContainerScreen(isDarkMode: Boolean, onThemeChange: (Boolean) -> Unit) {
 
     // Define the background brush based on the theme
     val containerBackgroundBrush = if (isDarkMode) {
-        Brush.verticalGradient(
-            colors = listOf(Color(0xFF1A1612), MainFamDarkBg),
-            startY = 0f,
-            endY = 1000f
+        Brush.linearGradient(
+            colors = listOf(Color(0xFF0A0A0A), Color(0xFF0A0A0A))
         )
     } else {
         // Light theme background matches Dashboard
         Brush.verticalGradient(
-            colors = listOf(Color(0xFFE0F2FE), Color.White),
+            colors = listOf(PrimaryBlue.copy(alpha = 0.1f), Color.White),
             startY = 0f,
             endY = 1000f
         )
@@ -87,7 +89,10 @@ fun MainContainerScreen(isDarkMode: Boolean, onThemeChange: (Boolean) -> Unit) {
         ) {
             when (selectedItemIndex) {
                 0 -> GuardDashboardScreen(isDarkMode = isDarkMode)
-                1 -> MyProfileScreen(isDarkMode = isDarkMode, onThemeChange = onThemeChange)
+                1 -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Logs Screen Content", color = if (isDarkMode) Color.White else Color.Black)
+                }
+                2 -> MyProfileScreen(isDarkMode = isDarkMode, onThemeChange = onThemeChange)
             }
         }
     }
@@ -97,6 +102,7 @@ fun MainContainerScreen(isDarkMode: Boolean, onThemeChange: (Boolean) -> Unit) {
 fun ModernFloatingBottomBar(selectedIndex: Int, onItemSelected: (Int) -> Unit, isDarkMode: Boolean, font: FontFamily) {
     val items = listOf(
         NavItem("HOME", Icons.Filled.Home, Icons.Filled.Home),
+        NavItem("LOGS", Icons.AutoMirrored.Filled.Assignment, Icons.AutoMirrored.Filled.Assignment),
         NavItem("PROFILE", Icons.Default.Person, Icons.Default.Person)
     )
 
@@ -121,7 +127,7 @@ fun ModernFloatingBottomBar(selectedIndex: Int, onItemSelected: (Int) -> Unit, i
                     .fillMaxSize()
                     .background(
                         if (isDarkMode) Brush.linearGradient(listOf(Color.Black, Color.Black)) 
-                        else Brush.verticalGradient(listOf(Color(0xFF00A8FF), Color(0xFF003366)))
+                        else Brush.verticalGradient(listOf(SecondaryBlue, PrimaryBlue))
                     )
                     .border(
                         width = 1.dp, 
@@ -208,6 +214,6 @@ fun ModernFloatingBottomBar(selectedIndex: Int, onItemSelected: (Int) -> Unit, i
 @Composable
 fun MultiMainDevicePreview() {
     NexEntryTheme {
-        MainContainerScreen(isDarkMode = false, onThemeChange = {})
+        MainContainerScreen(isDarkMode = true, onThemeChange = {})
     }
 }
